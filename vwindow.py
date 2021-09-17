@@ -13,7 +13,7 @@ def is_real_window(hwnd):
         if (lExStyle & win32con.WS_EX_TOOLWINDOW) == 0:
             if win32gui.GetWindowText(hwnd):
                 return True
-            return False
+        return False
 
 
 class VWindow(object):
@@ -45,7 +45,6 @@ vw = list()
 def exit():
     for i in range(0, 5):
         vw[i].show_visual_window()
-    sys.exit()
 
 
 def switch_to_window(param):
@@ -69,4 +68,5 @@ if __name__ == '__main__':
     keyboard.add_hotkey("alt+3", switch_to_window, args=(2,))
     keyboard.add_hotkey("alt+4", switch_to_window, args=(3,))
     keyboard.add_hotkey("alt+5", switch_to_window, args=(4,))
-    keyboard.wait()
+    keyboard.add_hotkey("ctrl+alt+q", exit)
+    keyboard.wait("ctrl+alt+q")
