@@ -2,18 +2,13 @@
 
 import win32con, win32gui
 import keyboard
-import sys
 
 
 def is_real_window(hwnd):
     if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) \
             and win32gui.IsWindowVisible(hwnd):
-        # hasNoOwner = win32gui.GetWindow(hwnd, win32con.GW_OWNER) == 0
         lExStyle = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
-        if (lExStyle & win32con.WS_EX_TOOLWINDOW) == 0:
-            if win32gui.GetWindowText(hwnd):
-                return True
-        return False
+        return not (lExStyle & win32con.WS_EX_TOOLWINDOW)
 
 
 class VWindow(object):
@@ -51,12 +46,9 @@ def switch_to_window(param):
     global old
     if param == old:
         return
-    try:
-        vw[old].hide_visual_window()
-        vw[param].show_visual_window()
-        old = param
-    except:
-        exit()
+    vw[old].hide_visual_window()
+    vw[param].show_visual_window()
+    old = param
 
 
 if __name__ == '__main__':
