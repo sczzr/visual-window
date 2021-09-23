@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
 import win32con, win32gui
-import keyboard
+import keyboard as kb
+import taskbar as tb
+import time
 
 
 def is_real_window(hwnd):
@@ -33,32 +35,70 @@ class VWindow(object):
             win32gui.ShowWindow(h, win32con.SW_SHOW)
 
 
-old = 0
-vw = list()
+class _Main(object):
+    vw = list()
+    old = 0
 
+    def __init__(self, vw_num=5):
+        self.SysTrayIcon = None
+        self.vw_num = vw_num
+        for i in range(0, vw_num):
+            self.vw.append(VWindow())
 
-def exit():
-    for i in range(0, 5):
-        vw[i].show_visual_window()
+    def switch_to_window(self, param):
+        if param == self.old:
+            return
+        self.vw[self.old].hide_visual_window()
+        self.vw[param].show_visual_window()
+        self.old = param
+        self.switch_icon(text=param)
 
+    def exit(self):
+        for i in range(0, self.vw_num):
+            self.vw[i].show_visual_window()
+        try:
+            self.SysTrayIcon.destroy()
+        except BaseException as e:
+            print(e.args)
 
-def switch_to_window(param):
-    global old
-    if param == old:
-        return
-    vw[old].hide_visual_window()
-    vw[param].show_visual_window()
-    old = param
+    def main(self):
+        kb.add_hotkey("alt+1", self.switch_to_window, args=(0,))
+        kb.add_hotkey("alt+2", self.switch_to_window, args=(1,))
+        kb.add_hotkey("alt+3", self.switch_to_window, args=(2,))
+        kb.add_hotkey("alt+4", self.switch_to_window, args=(3,))
+        kb.add_hotkey("alt+5", self.switch_to_window, args=(4,))
+        kb.add_hotkey("ctrl+alt+q", self.exit)
+        self.add_SysTrayIcon()
+        kb.wait("ctrl+alt+q")
+
+    def switch_icon(self, icon='./VisualDesktop.ico', text='0'):
+        if not self.SysTrayIcon:
+            self.SysTrayIcon.icon = icon
+            self.SysTrayIcon.hover_text = text
+            self.SysTrayIcon.refresh()
+            self.show_msg(msg='图标更换成功！')
+
+    def show_msg(self, title='切换桌面', msg='内容', time=500):
+        self.SysTrayIcon.refresh(title=title, msg=msg, time=time)
+
+    def add_SysTrayIcon(self, icon='./VisualDesktop.ico', hover_text="vwindow"):
+
+        menu_options = (('一级 菜单', None, self.switch_icon),
+                        ('二级 菜单', None, (('更改 图标', None, self.switch_icon),)))
+        self.SysTrayIcon = tb.window_tray_icon(icon=icon,
+                                               hover_text=hover_text,
+                                               menu_options=menu_options,
+                                               on_quit=self.exit)
+        self.SysTrayIcon.active()
+        # if not self.SysTrayIcon: self.SysTrayIcon = tb.SysTrayIcon(
+        #     icon,
+        #     hover_text,
+        #     menu_options,
+        #     on_quit=self.exit,
+        # )
+        # self.SysTrayIcon.activation()
 
 
 if __name__ == '__main__':
-    for i in range(0, 5):
-        vw.append(VWindow())
-    old = 0
-    keyboard.add_hotkey("alt+1", switch_to_window, args=(0,))
-    keyboard.add_hotkey("alt+2", switch_to_window, args=(1,))
-    keyboard.add_hotkey("alt+3", switch_to_window, args=(2,))
-    keyboard.add_hotkey("alt+4", switch_to_window, args=(3,))
-    keyboard.add_hotkey("alt+5", switch_to_window, args=(4,))
-    keyboard.add_hotkey("ctrl+alt+q", exit)
-    keyboard.wait("ctrl+alt+q")
+    app = _Main(6)
+    app.main()
