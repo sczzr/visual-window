@@ -1,3 +1,5 @@
+import os
+
 import win32con
 import win32gui
 
@@ -44,6 +46,7 @@ class SysTrayIcon(object):
 
     def refresh(self, icon, time=200):
         h_inst = win32gui.GetModuleHandle(None)
+        icon = os.path.join("./icon", icon)
         try:
             hicon = win32gui.LoadImage(h_inst, icon, win32con.IMAGE_ICON, 0, 0,
                                        win32con.LR_LOADFROMFILE | win32con.IMAGE_ICON)
