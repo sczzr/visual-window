@@ -51,7 +51,7 @@ class _Main(object):
         self.vw[self.old].hide_visual_window()
         self.vw[param].show_visual_window()
         self.old = param
-        self.switch_icon(text=param)
+        self.switch_icon(icon="./VisualDesktop"+str(param+1)+".ico")
 
     def exit(self):
         for i in range(0, self.vw_num):
@@ -62,30 +62,24 @@ class _Main(object):
             print(e.args)
 
     def main(self):
+        self.add_SysTrayIcon()
         kb.add_hotkey("alt+1", self.switch_to_window, args=(0,))
         kb.add_hotkey("alt+2", self.switch_to_window, args=(1,))
         kb.add_hotkey("alt+3", self.switch_to_window, args=(2,))
         kb.add_hotkey("alt+4", self.switch_to_window, args=(3,))
         kb.add_hotkey("alt+5", self.switch_to_window, args=(4,))
         kb.add_hotkey("ctrl+alt+q", self.exit)
-        self.add_SysTrayIcon()
         kb.wait("ctrl+alt+q")
 
-    def switch_icon(self, icon='./VisualDesktop.ico', text='0'):
-        if not self.SysTrayIcon:
-            self.SysTrayIcon.icon = icon
-            self.SysTrayIcon.hover_text = text
-            self.SysTrayIcon.refresh()
-            self.show_msg(msg='图标更换成功！')
+    def switch_icon(self, icon, text='0'):
+        if self.SysTrayIcon:
+            self.SysTrayIcon.refresh(icon=icon)
 
-    def show_msg(self, title='切换桌面', msg='内容', time=500):
-        self.SysTrayIcon.refresh(title=title, msg=msg, time=time)
-
-    def add_SysTrayIcon(self, icon='./VisualDesktop.ico', hover_text="vwindow"):
+    def add_SysTrayIcon(self, icon='./VisualDesktop1.ico', hover_text="vwindow"):
 
         menu_options = (('一级 菜单', None, self.switch_icon),
                         ('二级 菜单', None, (('更改 图标', None, self.switch_icon),)))
-        self.SysTrayIcon = tb.window_tray_icon(icon=icon,
+        self.SysTrayIcon = tb.SysTrayIcon(icon=icon,
                                                hover_text=hover_text,
                                                menu_options=menu_options,
                                                on_quit=self.exit)
