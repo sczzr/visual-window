@@ -1,21 +1,23 @@
 import os
-
+import sys
 import win32con
 import win32gui
+
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("./icon"), relative_path)
 
 
 class SysTrayIcon(object):
     QUIT = "QUIT"
     ID = 1234
 
-    def __init__(self, icon, hover_text, menu_options, on_quit=None):
+    def __init__(self, icon):
         self.hwnd = None
         self.notify_id = None
         self.icon = icon
-        self.hover_text = hover_text
-        self.on_quit = on_quit
-
-        menu_options = menu_options + (("exit", None, self.QUIT),)
 
         message_map = {
             win32con.WM_DESTROY: self.destroy,
@@ -46,7 +48,7 @@ class SysTrayIcon(object):
 
     def refresh(self, icon, time=200):
         h_inst = win32gui.GetModuleHandle(None)
-        icon = os.path.join("./icon", icon)
+        icon = resource_path(icon)
         try:
             hicon = win32gui.LoadImage(h_inst, icon, win32con.IMAGE_ICON, 0, 0,
                                        win32con.LR_LOADFROMFILE | win32con.IMAGE_ICON)
@@ -59,7 +61,7 @@ class SysTrayIcon(object):
 
         self.notify_id = (self.hwnd, 0,
                           win32gui.NIF_ICON | win32gui.NIF_MESSAGE | win32gui.NIF_TIP | win32gui.NIF_INFO,
-                          win32con.WM_USER + 20, hicon, self.hover_text)
+                          win32con.WM_USER + 20, hicon)
         win32gui.Shell_NotifyIcon(message, self.notify_id)
 
     def notify(self, hwnd, msg, wparam, lparam):

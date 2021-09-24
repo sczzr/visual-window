@@ -51,7 +51,7 @@ class _Main(object):
         self.vw[self.old].hide_visual_window()
         self.vw[param].show_visual_window()
         self.old = param
-        self.switch_icon(icon="./VisualDesktop"+str(param+1)+".ico")
+        self.switch_icon(icon="./VisualDesktop" + str(param + 1) + ".ico")
 
     def exit(self):
         for i in range(0, self.vw_num):
@@ -76,21 +76,8 @@ class _Main(object):
             self.SysTrayIcon.refresh(icon=icon)
 
     def add_SysTrayIcon(self, icon='./VisualDesktop1.ico', hover_text="vwindow"):
-
-        menu_options = (('一级 菜单', None, self.switch_icon),
-                        ('二级 菜单', None, (('更改 图标', None, self.switch_icon),)))
-        self.SysTrayIcon = tb.SysTrayIcon(icon=icon,
-                                               hover_text=hover_text,
-                                               menu_options=menu_options,
-                                               on_quit=self.exit)
+        self.SysTrayIcon = tb.SysTrayIcon(icon=icon)
         self.SysTrayIcon.active()
-        # if not self.SysTrayIcon: self.SysTrayIcon = tb.SysTrayIcon(
-        #     icon,
-        #     hover_text,
-        #     menu_options,
-        #     on_quit=self.exit,
-        # )
-        # self.SysTrayIcon.activation()
 
 
 if __name__ == '__main__':
